@@ -7,4 +7,4 @@ composer require autepos/stripe-intent
 ```
 
 ## Usage
-For usage see [AiPayment]https://github.com/autepos/ai-payment
+For usage see [AiPayment](https://github.com/autepos/ai-payment)
