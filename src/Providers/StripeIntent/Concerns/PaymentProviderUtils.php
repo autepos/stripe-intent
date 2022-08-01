@@ -208,7 +208,7 @@ trait PaymentProviderUtils
 
         // Check if we need to save the payment method
         if (isset($data['save_payment_method']) and intval($data['save_payment_method']) == 1 and $paymentResponse->success) {
-            $this->savePaymentMethod($paymentIntent->payment_method, $data, $transaction, $cashier);
+            $this->savePaymentMethod($paymentIntent->payment_method,  $transaction,$data, $cashier);
         }
 
 
@@ -314,7 +314,7 @@ trait PaymentProviderUtils
      *
      * @param array $data Any data to be passed on the the save method of payment method implementation.
      */
-    private function savePaymentMethod(string $payment_method_id, array $data = [], Transaction $transaction, Authenticatable $cashier = null): PaymentMethodResponse
+    private function savePaymentMethod(string $payment_method_id,  Transaction $transaction, array $data = [],Authenticatable $cashier = null): PaymentMethodResponse
     {
         $data['payment_method_id'] = $payment_method_id;
         try {

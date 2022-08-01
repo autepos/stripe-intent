@@ -25,6 +25,7 @@ trait PaymentMethodWebhookEventHandlers
             // SO THIS SHOULD NOT HAPPEN. BUT WE CANNOT CURRENTLY CONFIRM THE UNIVERSAL UNIQUENESS.
             $tenant_column_name=Tenant::getColumnName();
             $paymentProviderCustomerPaymentMethod=PaymentProviderCustomerPaymentMethod::query()
+            ->withoutGlobalScope(Tenant::globalScopeName())
             ->whereHas('customer',function($query)use($paymentMethod){
                 $query->where('payment_provider_customer_id',$paymentMethod->customer)
                 ->where('payment_provider',$this->paymentProvider->getProvider());

@@ -34,7 +34,7 @@ class StripeIntentPaymentProvider extends PaymentProvider
      *
      * @var string
      */
-    const VERSION = "1.0.0-beta4";
+    const VERSION = "1.0.0-beta5";
 
     /**
      * The Stripe API version.

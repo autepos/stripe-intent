@@ -32,7 +32,7 @@ class StripeIntentCustomer extends ProviderCustomer
         $paymentProviderCustomer = $this->paymentProviderCustomer($customerData);
 
         if (!$paymentProviderCustomer) {
-            $stripeCustomer = $this->createStripeCustomer($customerData, $this->provider);
+            $stripeCustomer = $this->createStripeCustomer($customerData);
 
             if ($stripeCustomer) {
                 $paymentProviderCustomer = $this->toPaymentProviderCustomer($stripeCustomer, $customerData);
