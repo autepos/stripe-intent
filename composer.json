@@ -5,7 +5,7 @@
     "keywords": ["ai-payment", "autepos", "stripe","payment"],
     "license": "MIT",
     "require": {
-        "php": "^7.3||^8.0||^8.1",
+        "php": "^7.3||^8.0",
         "autepos/ai-payment": "dev-main",
         "stripe/stripe-php": "^7.39||^8.0"
     },

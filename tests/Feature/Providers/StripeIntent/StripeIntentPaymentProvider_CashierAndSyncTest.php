@@ -93,7 +93,7 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
             ->andReturn($this->webhookEndpointUrl);
 
         //
-        $response = $partialMockPaymentProvider->up();
+        $response = $partialMockPaymentProvider->down();
 
         $this->assertInstanceOf(SimpleResponse::class, $response);
         $this->assertEquals(ResponseType::TYPE_SAVE, $response->getType()->getName());
@@ -103,12 +103,14 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
         $found_webhook = false;
         $endpoints = $partialMockPaymentProvider->client()
             ->webhookEndpoints->all();
+
         foreach ($endpoints->data as $endpoint_) {
             if ($endpoint_->id == $endpoint->id) {
                 $found_webhook = true;
                 break;
             }
         }
+
         $this->assertFalse($found_webhook);
     }
 

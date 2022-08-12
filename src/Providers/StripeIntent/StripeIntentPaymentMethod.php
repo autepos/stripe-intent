@@ -55,7 +55,6 @@ class StripeIntentPaymentMethod extends ProviderPaymentMethod
 
         // Get the associated payment provider customer
         $paymentProviderCustomer = $this->provider->customer()
-            ->provider($this->provider)
             ->toPaymentProviderCustomerOrCreate($this->customerData);
         if (!$paymentProviderCustomer) {
             $paymentMethodResponse->message = "There was an issue";
