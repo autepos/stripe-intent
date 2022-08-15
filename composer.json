@@ -14,7 +14,10 @@
         "orchestra/testbench": "^7.6"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "preferred-install": {
+            "autepos/ai-payment": "source"
+        }
     },
     "extra": {
         "laravel": {
@@ -25,12 +28,13 @@
     },
     "autoload": {
         "psr-4": {
-            "Autepos\\AiPayment\\": "src/"
+            "Autepos\\AiPayment\\Providers\\StripeIntent\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Autepos\\AiPayment\\Tests\\": "tests/"
+            "Autepos\\AiPayment\\Providers\\StripeIntent\\Tests\\": "tests/",
+            "Autepos\\AiPayment\\Tests\\": "vendor/autepos/ai-payment/tests/"
         }
     },
     "minimum-stability": "dev",

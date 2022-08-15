@@ -1,13 +1,13 @@
 <?php
 
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 use Mockery;
 use Stripe\Event;
 use Stripe\PaymentMethod;
 use Illuminate\Support\Facades\Log;
 use Autepos\AiPayment\Tenancy\Tenant;
-use Autepos\AiPayment\Tests\TestCase;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Autepos\AiPayment\Models\PaymentProviderCustomer;
 use Autepos\AiPayment\Providers\Contracts\PaymentProvider;
@@ -15,7 +15,7 @@ use Autepos\AiPayment\Models\PaymentProviderCustomerPaymentMethod;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentPaymentMethod;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentPaymentProvider;
 use Autepos\AiPayment\Providers\StripeIntent\Http\Controllers\StripeIntentWebhookController;
-use Autepos\AiPayment\Tests\Feature\Providers\StripeIntent\Stubs\StripeIntentWebhookControllerStub;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\Feature\Stubs\StripeIntentWebhookControllerStub;
 
 class StripeIntent_PaymentMethodWebhookEventHandlers_Test extends TestCase
 {

@@ -1,12 +1,12 @@
 <?php
 
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 use Mockery;
 use Stripe\Event;
 use Stripe\Customer;
 use Illuminate\Support\Facades\Log;
-use Autepos\AiPayment\Tests\TestCase;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentCustomer;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentPaymentProvider;

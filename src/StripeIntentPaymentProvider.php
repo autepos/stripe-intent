@@ -308,23 +308,7 @@ class StripeIntentPaymentProvider extends PaymentProvider
 
         $paymentResponse = new PaymentResponse(PaymentResponse::newType('refund'));
 
-        //
-        if (!$this->authoriseProviderTransaction($transaction)) { //TODO: This should already been taken care of by PaymentService
-            $paymentResponse->success = false;
-            $paymentResponse->errors = $this->hasSameLiveModeAsTransaction($transaction)
-                ? ['Unauthorised payment transaction with provider']
-                : ['Livemode mismatch'];
-            return $paymentResponse;
-        }
-
-        if (!$this->validateRefund($transaction, $amount)) { // TODO: Delete this block and the related test as this has already been taken care of by the PaymentService
-            $paymentResponse->message = 'Invalid refund. Check that their is enough fund available';
-            $paymentResponse->errors = [
-                'Invalid refund',
-                'Check that their enough fund available'
-            ];
-            return $paymentResponse;
-        }
+        
 
         $amount = $amount ?? $transaction->amount;
 

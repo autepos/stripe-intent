@@ -1,8 +1,8 @@
 <?php
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 use Illuminate\Http\Request;
-use Autepos\AiPayment\Tests\TestCase;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\TestCase;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentPaymentProvider;
 use Autepos\AiPayment\Providers\StripeIntent\Http\Controllers\StripeIntentWebhookController;

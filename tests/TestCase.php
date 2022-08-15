@@ -1,6 +1,6 @@
 <?php
 
-namespace Autepos\AiPayment\Tests;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests;
 
 use Autepos\AiPayment\AiPaymentServiceProvider;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentServiceProvider;

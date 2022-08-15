@@ -152,6 +152,8 @@ trait PaymentProviderUtils
      * charge claimed to have been made. We can record the charge after confirming it.
      * NOTE: We should ensure that we have not previously recorded the charge to avoid
      * duplicate.
+     * 
+     * Note that this method will attempt to confirm the associated payment intent if it requires confirmation.
      *
      * @param array $data [
      *      'save_payment_method'=>(int{0,1}) When 1 the payment method used to charge payment when payment is successful. Default is 0.
@@ -162,15 +164,7 @@ trait PaymentProviderUtils
     {
         $paymentResponse = new PaymentResponse(PaymentResponse::newType('charge'));
 
-        //
-        if (!$this->authoriseProviderTransaction($transaction)) { //TODO: This should already been taken care of by PaymentService
-            $paymentResponse->success = false;
-            $paymentResponse->errors = $this->hasSameLiveModeAsTransaction($transaction)
-                ? ['Unauthorised payment transaction with provider']
-                : ['Livemode mismatch'];
-            return $paymentResponse;
-        }
-
+        
 
         $payment_intent_id = $transaction->transaction_family_id;
 
@@ -180,7 +174,14 @@ trait PaymentProviderUtils
             try {
                 $paymentIntent = $this->retrievePaymentIntent($payment_intent_id);
 
+                // If the charge is not confirmed, we should confirm it 
+                if ($paymentIntent->status==PaymentIntent::STATUS_REQUIRES_CONFIRMATION) {
+                    $paymentIntent=$this->confirmPaymentIntent($paymentIntent->id);
+                    // OR
+                    //$paymentIntent=$paymentIntent->confirm();
+                }
 
+                //
                 $paymentResponse->message = $paymentIntent->status;
 
                 if ($paymentIntent and $paymentIntent->status == 'succeeded') {
@@ -253,7 +254,7 @@ trait PaymentProviderUtils
             $transaction->user_type = $providerCustomer->user_type;
             $transaction->user_id = $providerCustomer->user_id;
         } else {
-            // TODO: Note that the first conditions is unnecessary since we can always get the user_type and user_id from metadata when they exist.
+            // TODO: Note that the first conditions (i.e the 'if') is unnecessary since we can always get the user_type and user_id from metadata when they exist.
             $transaction->user_type = $paymentIntent->metadata->user_type ?? $transaction->user_type;
             $transaction->user_id = $paymentIntent->metadata->user_id ?? $transaction->user_id;
         }
@@ -396,6 +397,16 @@ trait PaymentProviderUtils
     {
         return  $this->client()
             ->paymentIntents->retrieve($payment_intent_id, []);
+    }
+
+    /**
+     * A helper to confirm Stripe payment intent
+     * @throws \Stripe\Exception\ApiErrorException — if the request fails
+     */
+    protected function confirmPaymentIntent(string $payment_intent_id): PaymentIntent
+    {
+        return  $this->client()
+            ->paymentIntents->confirm($payment_intent_id);
     }
 
     /**

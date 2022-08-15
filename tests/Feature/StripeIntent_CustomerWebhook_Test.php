@@ -1,9 +1,9 @@
 <?php
 
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 
-use Autepos\AiPayment\Tests\TestCase;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Autepos\AiPayment\Models\PaymentProviderCustomer;

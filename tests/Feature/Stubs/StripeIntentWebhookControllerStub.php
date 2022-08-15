@@ -1,5 +1,5 @@
 <?php
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent\Stubs;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature\Stubs;
 
 use Stripe\PaymentMethod;
 use Autepos\AiPayment\Providers\StripeIntent\Http\Controllers\StripeIntentWebhookController;

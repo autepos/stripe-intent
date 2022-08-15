@@ -1,10 +1,10 @@
 <?php
 
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 
 use Autepos\AiPayment\ResponseType;
-use Autepos\AiPayment\Tests\TestCase;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\TestCase;
 use Autepos\AiPayment\PaymentResponse;
 use Autepos\AiPayment\Models\Transaction;
 use Illuminate\Foundation\Testing\RefreshDatabase;

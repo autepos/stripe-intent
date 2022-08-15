@@ -1,26 +1,25 @@
 <?php
 
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 use Mockery;
 use Stripe\WebhookEndpoint;
 use Autepos\AiPayment\ResponseType;
 use Autepos\AiPayment\SimpleResponse;
-use Autepos\AiPayment\Tests\TestCase;
 use Autepos\AiPayment\PaymentResponse;
 use Autepos\AiPayment\Models\Transaction;
 use Illuminate\Foundation\Testing\WithFaker;
-use Autepos\AiPayment\Contracts\CustomerData;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Autepos\AiPayment\Providers\Contracts\Orderable;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\TestCase;
+use Autepos\AiPayment\Tests\ContractTests\PaymentProviderContractTest;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentPaymentProvider;
 
-class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
+class StripeIntentPaymentProviderTest extends TestCase
 {
     use RefreshDatabase;
     use StripeIntentTestHelpers;
-
+    use PaymentProviderContractTest;
 
 
     private $provider = StripeIntentPaymentProvider::PROVIDER;
@@ -34,6 +33,9 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
      */
     private $webhookEndpointUrl = 'http://www.stripeintenttesting.com';
 
+    public function subjectInstance(){
+        return $this->providerInstance();
+    }
 
     public function test_can_get_provider()
     {
@@ -114,15 +116,6 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
         $this->assertFalse($found_webhook);
     }
 
-    public function test_can_ping()
-    {
-        $response = $this->providerInstance()->ping();
-
-        $this->assertInstanceOf(SimpleResponse::class, $response);
-        $this->assertEquals(ResponseType::TYPE_PING, $response->getType()->getName());
-        $this->assertTrue($response->success);
-    }
-
     public function test_correct_response_when_unable_to_ping()
     {
         // Provide wrong config to force the communication to fail
@@ -142,109 +135,7 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
         $this->assertNotEmpty($response->errors);
     }
 
-    public function test_can_cashier_init_payment(): Transaction
-    {
-        $amount = 1000;
-
-        /**
-         * @var \Autepos\AiPayment\Providers\Contracts\Orderable
-         */
-        $mockOrder = Mockery::mock(Orderable::class);
-        $mockOrder->shouldReceive('getAmount')
-            ->once()
-            ->andReturn($amount);
-
-        $mockOrder->shouldReceive('getCurrency')
-            ->once()
-            ->andReturn('gbp');
-
-        $mockOrder->shouldReceive('getCustomer')
-            ->twice()
-            ->andReturn(new CustomerData(['user_type' => 'test-user', 'user_id' => null, 'email' => 'test@test.com']));
-
-        $mockOrder->shouldReceive('getKey')
-            ->twice()
-            ->andReturn(1);
-
-        $mockOrder->shouldReceive('getDescription')
-            ->once()
-            ->andReturn('test_can_cashier_init_payment');
-
-        /**
-         * @var \Illuminate\Contracts\Auth\Authenticatable
-         */
-        $mockCashier = Mockery::mock(Authenticatable::class);
-        $mockCashier->shouldReceive('getAuthIdentifier')
-            ->once()
-            ->andReturn(1);
-
-        $response = $this->providerInstance()
-            ->order($mockOrder)
-            ->cashierInit($mockCashier, null);
-
-        $this->assertInstanceOf(PaymentResponse::class, $response);
-        $this->assertEquals(ResponseType::TYPE_INIT, $response->getType()->getName());
-        $this->assertTrue($response->success);
-
-        $this->assertInstanceOf(Transaction::class, $response->getTransaction());
-        $this->assertEquals($this->provider, $response->getTransaction()->payment_provider);
-        $this->assertEquals($amount, $response->getTransaction()->orderable_amount);
-        $this->assertEquals(1, $response->getTransaction()->orderable_id);
-        $this->assertEquals(1, $response->getTransaction()->cashier_id);
-        $this->assertTrue($response->getTransaction()->exists, 'Failed asserting that transaction is stored');
-
-        return $response->getTransaction();
-    }
-
-
-
-    public function test_can_cashier_init_split_payment()
-    {
-        $amount = 1000;
-
-        /**
-         * @var \Autepos\AiPayment\Providers\Contracts\Orderable
-         */
-        $mockOrder = Mockery::mock(Orderable::class);
-        $mockOrder->shouldReceive('getKey')
-            ->twice()
-            ->andReturn(1);
-
-        $mockOrder->shouldReceive('getCurrency')
-            ->once()
-            ->andReturn('gbp');
-
-        $mockOrder->shouldReceive('getCustomer')
-            ->twice()
-            ->andReturn(new CustomerData(['user_type' => 'test-user', 'user_id' => null, 'email' => 'test@test.com']));
-
-        $mockOrder->shouldReceive('getDescription')
-            ->once()
-            ->andReturn('test_can_cashier_init_payment');
-
-        /**
-         * @var \Illuminate\Contracts\Auth\Authenticatable
-         */
-        $mockCashier = Mockery::mock(Authenticatable::class);
-        $mockCashier->shouldReceive('getAuthIdentifier')
-            ->once()
-            ->andReturn(1);
-
-        $response = $this->providerInstance()
-            ->order($mockOrder)
-            ->cashierInit($mockCashier, $amount);
-
-        $this->assertInstanceOf(PaymentResponse::class, $response);
-        $this->assertEquals(ResponseType::TYPE_INIT, $response->getType()->getName());
-        $this->assertTrue($response->success);
-
-        $this->assertInstanceOf(Transaction::class, $response->getTransaction());
-        $this->assertEquals($this->provider, $response->getTransaction()->payment_provider);
-        $this->assertEquals($amount, $response->getTransaction()->orderable_amount);
-        $this->assertTrue($response->getTransaction()->exists, 'Failed asserting that transaction stored');
-    }
-
-
+    
 
     /**
      * @depends test_can_cashier_init_payment
@@ -257,8 +148,6 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
         $transaction->save();
 
         $paymentIntent = $this->confirmPaymentIntentTransaction($transaction);
-
-
 
 
         /**
@@ -289,100 +178,76 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
         return $transaction;
     }
 
-    /**
-     * Transaction must have the same livemode value as offline payment provider. This
-     * is to ensure that payment made in livemode=true is charged in livemode=true 
-     * and vise versa
-     *
-     * @return void
-     */
-    public function test_cashier_cannot_charge_payment_on_livemode_mismatch()
+    public function test_cashier_cannot_charge_unsuccessful_payment()
     {
-
+        $transaction = $this->createUnsuccessfulPaymentTransaction();
 
         /**
          * @var \Illuminate\Contracts\Auth\Authenticatable
          */
         $mockCashier = Mockery::mock(Authenticatable::class);
+        $mockCashier->shouldReceive('getAuthIdentifier')
+            ->andReturn(1);
+    
 
-        $transaction = Transaction::factory()->create([
-            'orderable_id' => 1,
-            'payment_provider' => $this->provider,
-            'amount' => 1000,
-            'livemode' => false,
-        ]);
+        $response = $this->providerInstance()
+            ->cashierCharge($mockCashier,$transaction);
 
-        //
-        $provider = $this->providerInstance();
-
-        //
-        $provider->livemode(true);
-        $response = $provider->cashierCharge($mockCashier, $transaction);
         $this->assertInstanceOf(PaymentResponse::class, $response);
+        $this->assertEquals(ResponseType::TYPE_CHARGE, $response->getType()->getName());
         $this->assertFalse($response->success);
-        $this->assertStringContainsString('Livemode', implode(' .', $response->errors));
-
-        // Try the other way round
-        $transaction->livemode = true;
-        $transaction->save();
-        $provider->livemode(false);
-        $response = $provider->cashierCharge($mockCashier, $transaction);
-        $this->assertFalse($response->success);
-        $this->assertStringContainsString('Livemode', implode(' .', $response->errors));
+        $this->assertNull($response->getTransaction());
     }
+    
+
+
 
     /**
-     *
-     * Transaction's payment provider must be the current provider
+     * @depends test_can_customer_init_payment
      */
-    public function test_cashier_cannot_charge_payment_when_provider_mismatch()
+    public function test_can_customer_charge_payment(Transaction $transaction): Transaction
     {
+        // Since this is a new test the database would have been refreshed 
+        // so we need to re-add this transaction to db.
+        $transaction = Transaction::factory()->create($transaction->attributesToArray());
 
-        /**
-         * @var \Illuminate\Contracts\Auth\Authenticatable
-         */
-        $mockCashier = Mockery::mock(Authenticatable::class);
-
-        $transaction = Transaction::factory()->create([
-            'orderable_id' => 1,
-            'payment_provider' => 'wrong_provider',
-            'amount' => 1000,
-        ]);
+        $paymentIntent = $this->confirmPaymentIntentTransaction($transaction);
 
 
         $response = $this->providerInstance()
-            ->cashierCharge($mockCashier, $transaction);
+            ->charge($transaction);
 
         $this->assertInstanceOf(PaymentResponse::class, $response);
-        $this->assertFalse($response->success);
-        $this->assertStringContainsString('Unauthorised', implode(' .', $response->errors));
+        $this->assertEquals(ResponseType::TYPE_CHARGE, $response->getType()->getName());
+        $this->assertTrue($response->success);
+
+        $this->assertInstanceOf(Transaction::class, $response->getTransaction());
+        $this->assertEquals($this->provider, $response->getTransaction()->payment_provider);
+        $this->assertTrue($response->getTransaction()->success);
+        $this->assertEquals($transaction->orderable_amount, $response->getTransaction()->orderable_amount);
+        $this->assertEquals($transaction->orderable_amount, $response->getTransaction()->amount);
+        $this->assertEquals($transaction->orderable_id, $response->getTransaction()->orderable_id);
+        $this->assertNull($response->getTransaction()->cashier_id);
+
+        $this->assertDatabaseHas(new Transaction, ['id' => $response->getTransaction()->id]);
+
+        return $transaction;
     }
 
-
-    public function test_cashier_cannot_refund_more_than_transaction_amount()
+    public function test_customer_cannot_charge_unsuccessful_payment()
     {
-        $amount = 1000;
-        $too_much_refund_amount = $amount + 1;
-
-
-        $parentTransaction = Transaction::factory()->create([
-            'orderable_id' => 1,
-            'payment_provider' => $this->provider,
-            'amount' => $amount,
-        ]);
-
-        /**
-         * @var \Illuminate\Contracts\Auth\Authenticatable
-         */
-        $mockCashier = Mockery::mock(Authenticatable::class);
+        $transaction = $this->createUnsuccessfulPaymentTransaction();
 
         $response = $this->providerInstance()
-            ->refund($mockCashier, $parentTransaction, $too_much_refund_amount, 'Overpayment');
+            ->charge($transaction);
 
         $this->assertInstanceOf(PaymentResponse::class, $response);
-        $this->assertEquals(ResponseType::TYPE_REFUND, $response->getType()->getName());
+        $this->assertEquals(ResponseType::TYPE_CHARGE, $response->getType()->getName());
         $this->assertFalse($response->success);
+        $this->assertNull($response->getTransaction());
     }
+
+    
 
     public function test_can_cashier_refund_payment(): Transaction
     {
@@ -451,74 +316,6 @@ class StripeIntentPaymentProvider_CashierAndSyncTest extends TestCase
 
         //
         $this->assertEquals(-$part_refund_amount, $refundTransaction->amount_refunded);
-    }
-
-
-
-    /**
-     * Transaction must have the same livemode value as offline payment provider. This
-     * is to ensure that payment made in livemode=true is charged in livemode=true 
-     * and vise versa
-     *
-     * @return void
-     */
-    public function test_cashier_cannot_refund_payment_on_livemode_mismatch()
-    {
-
-        $parentTransaction = Transaction::factory()->create([
-            'orderable_id' => 1,
-            'payment_provider' => $this->provider,
-            'amount' => 1000,
-            'livemode' => false,
-        ]);
-
-        /**
-         * @var \Illuminate\Contracts\Auth\Authenticatable
-         */
-        $mockCashier = Mockery::mock(Authenticatable::class);
-
-
-        $provider = $this->providerInstance();
-        $provider->livemode(true);
-        $response = $provider->refund($mockCashier, $parentTransaction, 1000, 'Refund');
-        $this->assertInstanceOf(PaymentResponse::class, $response);
-        $this->assertFalse($response->success);
-        $this->assertStringContainsString('Livemode', implode(' .', $response->errors));
-
-        // Try the other way round
-        $parentTransaction->livemode = true;
-        $parentTransaction->save();
-        $provider->livemode(false);
-        $response = $provider->refund($mockCashier, $parentTransaction, 1000, 'Refund');
-        $this->assertFalse($response->success);
-        $this->assertStringContainsString('Livemode', implode(' .', $response->errors));
-    }
-
-    /**
-     * Transaction's payment provider must be the current payment provider
-     *
-     * @return void
-     */
-    public function test_cashier_cannot_refund_payment_on_provider_mismatch()
-    {
-
-        $parentTransaction = Transaction::factory()->create([
-            'orderable_id' => 1,
-            'payment_provider' => 'wrong_provider',
-            'amount' => 1000,
-        ]);
-
-        /**
-         * @var \Illuminate\Contracts\Auth\Authenticatable
-         */
-        $mockCashier = Mockery::mock(Authenticatable::class);
-
-
-        $response = $this->providerInstance()
-            ->refund($mockCashier, $parentTransaction, 1000, 'Refund');
-        $this->assertInstanceOf(PaymentResponse::class, $response);
-        $this->assertFalse($response->success);
-        $this->assertStringContainsString('Unauthorised', implode(' .', $response->errors));
     }
 
 

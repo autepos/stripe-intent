@@ -1,6 +1,6 @@
 <?php
 
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 use Stripe\Customer;
 use Stripe\PaymentIntent;

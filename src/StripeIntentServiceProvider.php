@@ -41,6 +41,6 @@ class StripeIntentServiceProvider extends ServiceProvider
         /**
          * Load routes for StripeIntent
          */
-        $this->loadRoutesFrom(dirname(dirname(dirname(__DIR__))) . '/routes/routes.php');
+        $this->loadRoutesFrom(dirname(__DIR__) . '/routes/routes.php');
     }
 }

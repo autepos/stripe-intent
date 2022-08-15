@@ -1,10 +1,10 @@
 <?php
 
-namespace Autepos\AiPayment\Tests\Feature\Providers\StripeIntent;
+namespace Autepos\AiPayment\Providers\StripeIntent\Tests\Feature;
 
 
 use Autepos\AiPayment\ResponseType;
-use Autepos\AiPayment\Tests\TestCase;
+use Autepos\AiPayment\Providers\StripeIntent\Tests\TestCase;
 use Autepos\AiPayment\CustomerResponse;
 use Illuminate\Foundation\Testing\WithFaker;
 use Autepos\AiPayment\Contracts\CustomerData;
