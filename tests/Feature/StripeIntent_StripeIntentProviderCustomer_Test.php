@@ -14,7 +14,7 @@ use Autepos\AiPayment\Providers\StripeIntent\StripeIntentCustomer;
 use Autepos\AiPayment\Providers\StripeIntent\StripeIntentPaymentProvider;
 
 
-class StripeIntent_StripeIntentCustomer_Test extends TestCase
+class StripeIntent_StripeIntentProviderCustomer_Test extends TestCase
 {
     use RefreshDatabase;
     use StripeIntentTestHelpers;

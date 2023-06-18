@@ -8,6 +8,7 @@ use Autepos\AiPayment\ResponseType;
 use Autepos\AiPayment\SimpleResponse;
 use Autepos\AiPayment\PaymentResponse;
 use Autepos\AiPayment\Models\Transaction;
+use Autepos\AiPayment\Providers\Contracts\PaymentProvider;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,7 +34,7 @@ class StripeIntentPaymentProviderTest extends TestCase
      */
     private $webhookEndpointUrl = 'http://www.stripeintenttesting.com';
 
-    public function subjectInstance(){
+    public function createContract():PaymentProvider{
         return $this->providerInstance();
     }
 

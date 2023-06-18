@@ -86,7 +86,7 @@ class StripeIntent_PaymentProviderWebhookEventHandlers_Test extends TestCase
      *
      * @return array
      */
-    public function webhookSecretConfigDataProvider(){
+    public static function webhookSecretConfigDataProvider(){
         return [
             'webhook secret set in config'=>[static::WEBHOOK_SECRET],
             'NO webhook secret set in config'=>[null]
